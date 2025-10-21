@@ -8,7 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 DEBUG = os.getenv("DEBUG", "1") == "1"
 DEBUG = False
-ALLOWED_HOSTS = ['.onrender.com']
+ALLOWED_HOSTS = ["geoecotracker.onrender.com", "localhost", "127.0.0.1",".onrender.com"]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
