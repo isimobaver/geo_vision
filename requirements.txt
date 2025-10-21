@@ -1,6 +1,4 @@
 asgiref==3.8.1
-aspose-pdf==25.9.0  # تم تحديثه لإصدار متوافق
-aspose-words==24.2.0
 Django==5.0.6
 django-background-tasks==1.2.8
 django-cors-headers==4.7.0
@@ -13,3 +11,4 @@ gunicorn==23.0.0
 whitenoise==6.11.0
 python-dotenv==1.0.1
 requests==2.31.0
+
