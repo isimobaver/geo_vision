@@ -1,0 +1,62 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">لوحة المؤشرات العامة</h2>
+<div class="row g-3">
+  <div class="col-md-3"><div class="card kpi kpi-green"><div class="card-body text-center"><div class="kpi-title">إجمالي المواقع</div><div class="kpi-value">{{ total_sites }}</div></div></div></div>
+  <div class="col-md-3"><div class="card kpi kpi-green"><div class="card-body text-center"><div class="kpi-title">أخضر</div><div class="kpi-value">{{ green }}</div></div></div></div>
+  <div class="col-md-3"><div class="card kpi kpi-yellow"><div class="card-body text-center"><div class="kpi-title">أصفر</div><div class="kpi-value">{{ yellow }}</div></div></div></div>
+  <div class="col-md-3"><div class="card kpi kpi-red"><div class="card-body text-center"><div class="kpi-title">أحمر</div><div class="kpi-value">{{ red }}</div></div></div></div>
+</div>
+
+<div class="row mt-4 g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header">الإنتاج حسب المعدن ({{ latest_year }})</div>
+      <div class="card-body"><canvas id="mineralChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header">تقييم الاستدامة للشركات</div>
+      <div class="card-body"><canvas id="companyChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">تنبيهات حديثة</div>
+      <div class="card-body">
+        <ul class="list-group">
+          {% for a in alerts %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ a.site.name }} — {{ a.message }}</span>
+            <span class="badge {% if a.level == 'critical' %}bg-danger{% elif a.level == 'warn' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ a.level }}</span>
+          </li>
+          {% empty %}<li class="list-group-item">لا يوجد تنبيهات</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const mineralData = {{ prod_by_mineral|safe }}.map(d => ({name: d["site__mineral__name"], total: d.total}));
+const mlabels = mineralData.map(d => d.name);
+const mvalues = mineralData.map(d => d.total);
+new Chart(document.getElementById('mineralChart'), {
+  type: 'bar',
+  data: { labels: mlabels, datasets: [{ label: 'الإنتاج', data: mvalues }] },
+  options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+const companyScores = {{ company_scores|safe }};
+new Chart(document.getElementById('companyChart'), {
+  type: 'radar',
+  data: { labels: companyScores.map(d=>d.name), datasets: [{ label: 'الاستدامة', data: companyScores.map(d=>d.sustainability_score) }] },
+  options: { responsive: true }
+});
+</script>
+{% endblock %}

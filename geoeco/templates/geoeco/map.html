@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3 fade-in">الخريطة التفاعلية لمواقع التعدين</h2>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div id="map" style="height: 70vh;" class="rounded border"></div>
+
+{# نخرج JSON آمن خارج <script> #}
+{{ sites_data|json_script:"sitesData" }}
+
+<script>
+const map = L.map('map').setView([21.4735, 55.9754], 6); // Oman approx
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+const bandColors = { green: 'green', yellow: 'orange', red: 'red' };
+const sites = JSON.parse(document.getElementById('sitesData').textContent);
+
+// ارسم النقاط—مع تحمّل أي قيم ناقصة
+sites.forEach(s => {
+  if (s.lat == null || s.lon == null) return;
+  const color = bandColors[s.sustainability_band] || 'gray';
+  L.circleMarker([s.lat, s.lon], {
+    radius: 8,
+    color: color,
+    fillColor: color,
+    fillOpacity: 0.6,
+    weight: 1
+  })
+  .addTo(map)
+  .bindPopup(
+    `<b>${s.name}</b><br/>
+     الشركة: ${s.company__name || '-'}<br/>
+     المعدن: ${s.mineral__name || '-'}<br/>
+     الحالة: ${s.status}<br/>
+     <a href="/site/${s.id}/" class="btn btn-sm btn-primary mt-2">التفاصيل</a>`
+  );
+});
+
+// إن لم توجد بيانات، أظهر رسالة صغيرة في الكونسول
+if (!sites.length) {
+  console.warn("لا توجد مواقع في قاعدة البيانات. أضف بيانات عبر seed.json أو generate_bulk_data.");
+}
+</script>
+{% endblock %}

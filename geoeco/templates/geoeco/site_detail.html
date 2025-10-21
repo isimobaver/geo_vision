@@ -1,0 +1,93 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">{{ site.name }}</h3>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <p>الشركة: <strong>{{ site.company.name|default:"-" }}</strong></p>
+        <p>المعدن: <strong>{{ site.mineral.name|default:"-" }}</strong></p>
+        <p>الحالة: <strong>{{ site.get_status_display }}</strong></p>
+        <p>الحاكمية: <strong>{{ site.governorate }}</strong></p>
+        <span class="badge {% if site.sustainability_band == 'green' %}bg-success{% elif site.sustainability_band == 'yellow' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+          {{ site.sustainability_band }}
+        </span>
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-header">تنبيهات</div>
+      <ul class="list-group list-group-flush">
+        {% for a in alerts %}<li class="list-group-item">{{ a.message }}</li>{% empty %}<li class="list-group-item">لا يوجد</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card mb-3">
+      <div class="card-header">الإنتاج (سنوي)</div>
+      <div class="card-body"><canvas id="prodChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">البيئة (آخر 12 قراءة)</div>
+      <div class="card-body"><canvas id="envChart"></canvas></div>
+    </div>
+  </div>
+</div>
+{# ضعهما قبل سكربت الجافاسكربت #}
+{{ prod_data|json_script:"prodData" }}
+{{ env_data|json_script:"envData" }}
+
+<script>
+async function loadForecasts() {
+  const res = await fetch(`/forecast/site/{{ site.id }}/`);
+  const data = await res.json();
+
+  // إنتاج متوقّع (سنوي)
+  const fYears = data.production.map(p => p.year);
+  const fQty   = data.production.map(p => p.quantity);
+
+  // لو عندك dataset "فعلي" باسم prodParsed (كما في كودك السابق)
+  const ctx = document.getElementById('prodChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [...prodParsed.map(p=>p.year), ...fYears],
+      datasets: [
+        { label: 'فعلي', data: prodParsed.map(p=>p.quantity), tension: 0.2 },
+        { label: 'متوقّع', data: [...Array(prodParsed.length).fill(null), ...fQty], borderDash: [6,6], tension: 0.2 }
+      ]
+    },
+    options: { responsive: true }
+  });
+}
+loadForecasts();
+</script>
+
+
+<script>
+const prodParsed = JSON.parse(document.getElementById("prodData").textContent);
+new Chart(document.getElementById('prodChart'), {
+  type: 'line',
+  data: {
+    labels: prodParsed.map(p => p.year),
+    datasets: [{ label: 'الإنتاج', data: prodParsed.map(p => p.quantity) }]
+  },
+  options: { responsive: true }
+});
+
+const envParsed = JSON.parse(document.getElementById("envData").textContent);
+new Chart(document.getElementById('envChart'), {
+  type: 'line',
+  data: {
+    labels: envParsed.map(e => e.date),
+    datasets: [
+      { label: 'AQI', data: envParsed.map(e => e.air_quality_index) },
+      { label: 'TDS', data: envParsed.map(e => e.water_tds) },
+      { label: 'Rehab %', data: envParsed.map(e => e.rehabilitation_progress) },
+    ]
+  },
+  options: { responsive: true }
+});
+</script>
+
+{% endblock %}

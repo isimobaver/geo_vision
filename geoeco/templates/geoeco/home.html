@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5 fade-in">
+  <div class="row align-items-center">
+    <!-- القسم الأيسر (النص والأزرار) -->
+    <div class="col-lg-6 mb-4">
+      <h1 class="display-5 fw-bold mb-3">مرحبًا بك في <span class="text-success">GeoEco Tracker</span></h1>
+      <p class="lead mb-4">
+        منصة ذكية لإدارة بيانات التعدين والاستدامة البيئية في سلطنة عمان.
+      </p>
+      <div class="d-flex gap-3 flex-wrap">
+        <a href="/dashboard/" class="btn btn-success btn-lg shadow-sm">
+          <i class="bi bi-speedometer2 me-2"></i> عرض اللوحة
+        </a>
+        <a href="/map/" class="btn btn-outline-primary btn-lg shadow-sm">
+          <i class="bi bi-geo-alt-fill me-2"></i> الخريطة التفاعلية
+        </a>
+      </div>
+    </div>
+
+    <!-- القسم الأيمن (المؤشرات) -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4"><i class="bi bi-bar-chart-line text-success me-2"></i> مؤشرات سريعة</h5>
+          <div class="kpi-container">
+            <!-- مؤشر عدد المواقع -->
+            <div class="kpi kpi-green">
+              <div class="kpi-title"><i class="bi bi-geo-alt text-success me-2"></i> مواقع التعدين</div>
+              <div class="kpi-value">{{ kpis.sites }}</div>
+            </div>
+
+            <!-- مؤشر المشاريع الخضراء -->
+            <div class="kpi kpi-yellow">
+              <div class="kpi-title"><i class="bi bi-tree text-warning me-2"></i> مشاريع خضراء</div>
+              <div class="kpi-value">{{ kpis.sustainable_projects }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

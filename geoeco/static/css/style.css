@@ -1,0 +1,7 @@
+
+body { font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+.kpi .kpi-title{font-size:14px;color:#666}
+.kpi .kpi-value{font-size:28px;font-weight:700}
+.kpi-green{border-left:6px solid #28a745}
+.kpi-yellow{border-left:6px solid #ffc107}
+.kpi-red{border-left:6px solid #dc3545}
