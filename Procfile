@@ -1,1 +1,1 @@
-web: gunicorn GeoEcoTracker.wsgi
+web: gunicorn geoecotracker.wsgi
